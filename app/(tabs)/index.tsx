@@ -1,12 +1,59 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
 
 export default function HomeScreen() {
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [locationStatus, setLocationStatus] = useState<Location.PermissionStatus>(Location.PermissionStatus.UNDETERMINED)
+  const [locationButtonText, setLocationButtonText] = useState<string>("Grant permission");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const requestLocationPermissionsAsync = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    setLocationStatus(status);
+    let lbt = "";
+    switch (status) {
+      case Location.PermissionStatus.GRANTED:
+        lbt = "Permission granted";
+        break;
+      case Location.PermissionStatus.UNDETERMINED:
+        lbt = "Grant Location Permission";
+        break;
+      case Location.PermissionStatus.DENIED:
+        lbt = "Location permission denied";
+        break;
+    }
+    console.log("got: "+status+" transformed to: "+lbt);
+    setLocationButtonText(lbt);
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
+  }
+
+  const getCurrentLocation = async () => {
+     await requestLocationPermissionsAsync() 
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+  }
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  const requestLocationPermissions = () => {
+    requestLocationPermissionsAsync()
+  }
+
+  
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -21,34 +68,15 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
+        <ThemedText type="subtitle">Step 1: give GPS permissions</ThemedText>
+        <Button onPress={requestLocationPermissions} title={locationButtonText} 
+        disabled={locationStatus !== Location.PermissionStatus.UNDETERMINED}
+        />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+        <ThemedText type="subtitle">Step 2: Explore the data</ThemedText>
         <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+          {`Tap the Data tab to watch your GPS positions and other interesting data.`}
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>

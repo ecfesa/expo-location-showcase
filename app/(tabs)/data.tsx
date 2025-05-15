@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Button, Platform, StyleSheet } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -7,8 +7,28 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
 
 export default function TabTwoScreen() {
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+
+  const getCurrentLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.BestForNavigation,
+      distanceInterval: 10, // in meters
+      timeInterval: 5 * 1000, // milliseconds
+      mayShowUserSettingsDialog: false,
+    });
+    console.log('location: '+JSON.stringify(location));
+    setLocation(location);
+  }
+
+  useEffect(() => {
+    getCurrentLocation()
+  }, [])
+
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -22,6 +42,11 @@ export default function TabTwoScreen() {
       }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
+      </ThemedView>
+      <ThemedView >
+        <ThemedText>Click the button below to request an update of the location data:</ThemedText>
+        <Button title="Update Location Data" onPress={getCurrentLocation}></Button>
+
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
