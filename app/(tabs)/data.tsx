@@ -1,8 +1,6 @@
-import { Image } from 'expo-image';
 import { Button, Platform, StyleSheet } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,6 +10,7 @@ import { useEffect, useState } from 'react';
 
 export default function DataTabScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [address, setAddress] = useState<Location.LocationGeocodedAddress | null>(null);
 
   const getCurrentLocation = async () => {
     let location = await Location.getCurrentPositionAsync({
@@ -22,6 +21,12 @@ export default function DataTabScreen() {
     });
     console.log('location: '+JSON.stringify(location));
     setLocation(location);
+
+    const geoResults = await Location.reverseGeocodeAsync(location.coords);
+    if (geoResults.length > 0) {
+      console.log('address:', geoResults[0]);
+      setAddress(geoResults[0]);
+    }
   }
 
   useEffect(() => {
@@ -69,6 +74,20 @@ export default function DataTabScreen() {
             </ThemedText>
           </Collapsible>
         </>
+      )}
+
+      {address && (
+        <Collapsible title="Address (Reverse Geocoded)">
+          <ThemedText>Street: {address.street ?? 'N/A'}</ThemedText>
+          <ThemedText>Name/Number: {address.name ?? 'N/A'}</ThemedText>
+          <ThemedText>District: {address.district ?? 'N/A'}</ThemedText>
+          <ThemedText>Subregion/City: {address.city ?? (address.subregion ?? 'N/A')}</ThemedText>
+          <ThemedText>Region/State: {address.region ?? 'N/A'}</ThemedText>
+          <ThemedText>Postal Code: {address.postalCode ?? 'N/A'}</ThemedText>
+          <ThemedText>Country: {address.country ?? 'N/A'}</ThemedText>
+          <ThemedText>ISO Country Code: {address.isoCountryCode ?? 'N/A'}</ThemedText>
+          <ThemedText>Full Address: {address.formattedAddress ?? 'N/A'}</ThemedText>
+        </Collapsible>
       )}
     </ParallaxScrollView>
   );
