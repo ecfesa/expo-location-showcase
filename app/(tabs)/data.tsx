@@ -59,8 +59,9 @@ export default function DataTabScreen() {
           <Collapsible title="Coordinates">
             <ThemedText>Latitude: {location.coords.latitude}</ThemedText>
             <ThemedText>Longitude: {location.coords.longitude}</ThemedText>
-            <ThemedText>Altitude: {location.coords.altitude ?? 'N/A'} meters</ThemedText>
             <ThemedText>Accuracy: {location.coords.accuracy} meters</ThemedText>
+            <ThemedText>Altitude: {location.coords.altitude ?? 'N/A'} meters</ThemedText>
+            <ThemedText>Altitude Accuracy: {location.coords.altitudeAccuracy ?? 'N/A'} meters</ThemedText>
           </Collapsible>
 
           <Collapsible title="Movement">
