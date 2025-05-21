@@ -4,6 +4,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 It was made to showcase the location capabilities and API for Expo's Location library.
 
+## Installation
+
+To install Expo's Location library, run the command below:
+```bash
+npx expo install expo-location
+```
+
 A video showcasing the app and a GPX file for testing is available in this repository:
 - [exposition.mp4](exposition.mp4)
 - [example_movement.gpx](example_movement.gpx)
